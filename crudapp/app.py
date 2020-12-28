@@ -102,6 +102,50 @@ def editClient():
     print(type(idt))
 
     return redirect(url_for('client'))
+####################################################################### COMPTE ##############################################################
+
+@app.route('/compte')
+def compte():
+    res = requests.get("http://localhost:9191/comptes")
+    res = list(res.json())
+    context = res
+    return render_template('compte.html',contexts=context)
+
+@app.route('/ajouterCompte', methods=['POST','GET'])
+def ajouterCompte():
+    decouvert = request.form['decouvert']
+    solde = request.form['solde']
+
+    x = requests.post('http://localhost:9191/addCompte',json = {"decouvert": decouvert, "solde":solde})
+
+    print(x)
+
+    return redirect(url_for('compte'))
+
+
+@app.route('/deleteCompte/<int:id>', methods=['GET'])
+def deleteCompte(id):
+
+    url = 'http://localhost:9191/deleteCompte/'+str(id)
+    requests.delete(url)
+    
+    print(url)
+
+    return redirect(url_for('compte'))
+
+
+@app.route('/editCompte', methods=['POST'])
+def editCompte():
+    idt = request.form['id']
+    decouvert = request.form['decouvert']
+    solde = request.form['solde']
+    idt= int(idt)
+
+    x = requests.put('http://localhost:9191/updateCompte',json = {"id": idt, "decouvert": decouvert, "solde":solde})
+    print(x)
+    print(type(idt))
+
+    return redirect(url_for('compte'))
 
 if __name__ == '__main__':
     app.run()
