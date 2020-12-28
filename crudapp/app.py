@@ -8,6 +8,8 @@ app = Flask(__name__)
 @app.route('/')
 def hello():
     return render_template('index.html')
+
+############################################# AGENCE ################################################################
     
 @app.route('/agence')
 def agence():
@@ -51,11 +53,55 @@ def editAgence():
 
     return redirect(url_for('agence'))
 
-@app.route('/editAgenceVue', methods=['GET'])
-def editAgenceVue():
 
-    return render_template('agence.html',id="editAgence")
+############################################################### CLIENT ####################################################################
 
+@app.route('/client')
+def client():
+    res = requests.get("http://localhost:9191/clients")
+    res = list(res.json())
+    context = res
+    return render_template('client.html',contexts=context)
+
+@app.route('/ajouterClient', methods=['POST','GET'])
+def ajouterClient():
+    date_naissance = request.form['date_naissance']
+    nom = request.form['nom']
+    prenom = request.form['prenom']
+
+    print(date_naissance,nom,prenom)
+
+    x = requests.post('http://localhost:9191/addClient',json = {"date_naissance": date_naissance, "nom": nom, "prenom":prenom})
+
+    print(x)
+
+    return redirect(url_for('client'))
+
+
+@app.route('/deleteClient/<int:id>', methods=['GET'])
+def deleteClient(id):
+
+    url = 'http://localhost:9191/deleteClient/'+str(id)
+    requests.delete(url)
+
+    print(url)
+
+    return redirect(url_for('client'))
+
+
+@app.route('/editClient', methods=['POST'])
+def editClient():
+    idt = request.form['id']
+    date_naissance = request.form['date_naissance']
+    nom = request.form['nom']
+    prenom = request.form['prenom']
+    idt= int(idt)
+
+    x = requests.put('http://localhost:9191/updateClient',json = {"id": idt, "date_naissance": date_naissance, "nom": nom, "prenom":prenom})
+    print(x)
+    print(type(idt))
+
+    return redirect(url_for('client'))
 
 if __name__ == '__main__':
     app.run()
